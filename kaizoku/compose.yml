@@ -1,0 +1,64 @@
+version: '3'
+
+volumes:
+  db:
+  redis:
+
+networks:
+  kaizoku:
+  frontend:
+    external: true
+services:
+  app:
+    container_name: kaizoku
+    image: ghcr.io/oae/kaizoku:latest
+    environment:
+      - DATABASE_URL=postgresql://kaizoku:kaizoku@db:5432/kaizoku
+      - KAIZOKU_PORT=3000
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Berlin
+    volumes:
+      - /media/truenas/manga:/data
+      - ./config:/config
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - frontend
+      - kaizoku
+    labels:
+      - homepage.group=Media
+      - homepage.name=Kaizoku
+      - homepage.icon=mdi-book
+      - homepage.href=https://kaizoku.luks.cool/
+      - homepage.description=Manga Aggregator
+      - traefik.enable=true
+      - traefik.http.routers.kaizoku.entrypoints=https
+      - traefik.http.routers.kaizoku.rule=Host(`kaizoku.luks.cool`)
+      - traefik.http.services.kaizoku.loadbalancer.server.port=3000
+      - com.centurylinklabs.watchtower.enable=true
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis:/data
+    networks:
+      - kaizoku
+  db:
+    image: postgres:alpine
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U kaizoku']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    environment:
+      - POSTGRES_USER=kaizoku
+      - POSTGRES_DB=kaizoku
+      - POSTGRES_PASSWORD=kaizoku
+    networks:
+      - kaizoku
+    volumes:
+      - db:/var/lib/postgresql/data

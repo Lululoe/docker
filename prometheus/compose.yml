@@ -1,0 +1,72 @@
+version: "3.3"
+services:
+  prometheus:
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    image: prom/prometheus:latest
+    networks:
+      prometheus: null
+      backend: null
+      frontend: null
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    restart: unless-stopped
+    labels:
+      - homepage.group=Statistics
+      - homepage.name=Prometheus
+      - homepage.icon=si-prometheus
+      - homepage.href=https://prometheus.luks.cool/
+      - homepage.description=Statistics Database
+      - traefik.enable=true
+      - traefik.http.routers.prometheus.entrypoints=https
+      - traefik.http.services.prometheus.loadbalancer.server.port=9090
+      - com.centurylinklabs.watchtower.enable=true
+  #  node_exporter:
+  #    image: quay.io/prometheus/node-exporter:latest
+  #    container_name: node_exporter
+  #    command:
+  #      - --path.rootfs=/host
+  #    pid: host
+  #    network_mode: host
+  #    restart: unless-stopped
+  #    volumes:
+  #      - /:/host:ro,rslave
+  #    labels:
+  #      - com.centurylinklabs.watchtower.enable=true
+  influxdb-exporter:
+    restart: unless-stopped
+    container_name: influxdb-exporter
+    image: prom/influxdb-exporter
+    networks:
+      prometheus: null
+    ports:
+      - 9122:9122
+    labels:
+      - com.centurylinklabs.watchtower.enable=true
+  cadvisor:
+    restart: unless-stopped
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    ports:
+      - 8080:8080
+    networks:
+      prometheus: null
+    container_name: cadvisor
+    privileged: true
+    devices:
+      - /dev/kmsg
+    image: gcr.io/cadvisor/cadvisor:latest
+    labels:
+      - com.centurylinklabs.watchtower.enable=true
+networks:
+  prometheus:
+    name: prometheus
+  backend:
+    external: true
+  frontend:
+    external: true

@@ -1,0 +1,35 @@
+version: "3"
+networks:
+  loki:
+    name: loki
+  backend:
+    external: true
+services:
+  loki:
+    container_name: loki
+    image: grafana/loki:2.9.4
+    ports:
+      - 3100:3100
+    volumes:
+      - ./etc-loki:/etc/loki
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - loki
+      - backend
+    labels:
+      - homepage.group=Statistics
+      - homepage.name=Loki
+      - homepage.icon=mdi-magnify
+      - homepage.href=https://grafana.luks.cool/
+      - homepage.description=Log Aggregator
+    restart: unless-stopped
+  promtail:
+    container_name: promtail
+    image: grafana/promtail:2.9.4
+    volumes:
+      - /var/log:/var/log
+      - ./etc-promtail:/etc/promtail
+    command: -config.file=/etc/promtail/config.yml
+    restart: unless-stopped
+    networks:
+      - loki

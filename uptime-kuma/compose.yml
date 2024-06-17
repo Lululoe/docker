@@ -1,0 +1,25 @@
+version: "3.8"
+networks:
+  frontend:
+    name: frontend
+    external: true
+services:
+  uptime-kuma:
+    image: louislam/uptime-kuma:latest
+    container_name: uptime-kuma
+    volumes:
+      - ./data:/app/data
+      - /var/run/docker.sock:/var/run/docker.sock # (optional) For docker integrations
+    restart: always
+    networks:
+      - frontend
+    labels:
+      - homepage.group=Administration
+      - homepage.name=Uptime Kuma
+      - homepage.icon=si-uptimekuma
+      - homepage.href=https://uptime-kuma.luks.cool/
+      - homepage.description=Uptime Kuma
+      - traefik.enable=true
+      - traefik.http.routers.uptime-kuma.entrypoints=https
+      - traefik.http.services.uptime-kuma.loadbalancer.server.port=3001
+      - com.centurylinklabs.watchtower.enable=true

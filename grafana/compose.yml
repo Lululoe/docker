@@ -1,0 +1,31 @@
+version: "3.8"
+services:
+  grafana:
+    image: grafana/grafana-enterprise
+    container_name: grafana
+    restart: unless-stopped
+    networks:
+      frontend: null
+      backend: null
+    user: "1000"
+    volumes:
+      - grafana:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ALLOW_EMBEDDING=true
+    labels:
+      - homepage.group=Statistics
+      - homepage.name=Grafana
+      - homepage.icon=si-grafana
+      - homepage.href=https://grafana.luks.cool/
+      - homepage.description=Statistics Dashboards
+      - traefik.enable=true
+      - traefik.http.routers.grafana.entrypoints=https
+      - traefik.http.services.grafana.loadbalancer.server.port=3000
+      - com.centurylinklabs.watchtower.enable=true
+networks:
+  frontend:
+    external: true
+  backend:
+    external: true
+volumes:
+  grafana: {}

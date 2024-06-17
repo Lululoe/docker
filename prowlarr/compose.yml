@@ -1,0 +1,35 @@
+version: "3"
+networks:
+  frontend:
+    driver: bridge
+    name: frontend
+    external: true
+  backend:
+    external: true
+services:
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    networks:
+      - frontend
+      - backend
+    volumes:
+      - ./config:/config
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Berlin
+    labels:
+      - homepage.group=Torrent
+      - homepage.name=Prowlarr
+      - homepage.icon=mdi-magnet
+      - homepage.href=https://prowlarr.luks.cool/
+      - homepage.description=Torrent Indexer Aggregator
+      - homepage.widget.type=prowlarr
+      - homepage.widget.url=http://prowlarr:9696
+      - homepage.widget.key=0e77bce754d843e6abc6218d50a55569
+      - traefik.enable=true
+      - traefik.http.routers.prowlarr.entrypoints=https
+      - traefik.http.services.prowlarr.loadbalancer.server.port=9696
+      - com.centurylinklabs.watchtower.enable=true
+    restart: unless-stopped

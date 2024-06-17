@@ -1,0 +1,61 @@
+version: "3"
+volumes:
+  mysql_data: null
+  resources: null
+  redis_data: null
+services:
+  romm:
+    image: rommapp/romm:latest
+    container_name: romm
+    restart: unless-stopped
+    networks:
+      frontend: null
+      backend: null
+    environment:
+      - DB_HOST=romm-db
+      - DB_NAME=romm # Should match MYSQL_DATABASE in mariadb
+      - DB_USER=romm-user # Should match MYSQL_USER in mariadb
+      - DB_PASSWD=lustfully-kisser-quizzical # Should match MYSQL_PASSWORD in mariadb
+      - IGDB_CLIENT_ID=cvu8d69ynvw59lfby28oileicy1gi3
+      - IGDB_CLIENT_SECRET=xf4cpakryml6cttxn1l6jgexeyrirq
+      - ROMM_AUTH_SECRET_KEY=
+        2159a87582b7755b15f7cf62611f3fc127e0a0bb8df35192f8089c915f9d5b57#
+        Generate a key with `openssl rand -hex 32`
+      - ROMM_AUTH_USERNAME=admin
+      - ROMM_AUTH_PASSWORD=admin # default: admin
+    volumes:
+      - ./resources:/romm/resources # Resources fetched from IGDB (covers, screenshots, etc.)
+      - redis_data:/redis-data # Cached data for background tasks
+      - /media/truenas/ROMS:/romm/library/roms
+      - ./assets:/romm/assets # Uploaded saves, states, etc.
+    depends_on:
+      - romm-db
+    labels:
+      - homepage.group=Media
+      - homepage.name=RomM
+      - homepage.icon=mdi-controller
+      - homepage.href=https://romm.luks.cool/
+      - homepage.description=Rom Library
+      - traefik.enable=true
+      - traefik.http.routers.romm.entrypoints=https
+      - traefik.http.services.romm.loadbalancer.server.port=8080
+      - com.centurylinklabs.watchtower.enable=true
+  romm-db:
+    image: mariadb:latest
+    container_name: romm-db
+    restart: unless-stopped
+    networks:
+      frontend: null
+      backend: null
+    environment:
+      - MYSQL_ROOT_PASSWORD=truce-unsworn-federal # Use a unique, secure password
+      - MYSQL_DATABASE=romm
+      - MYSQL_USER=romm-user
+      - MYSQL_PASSWORD=lustfully-kisser-quizzical
+    volumes:
+      - mysql_data:/var/lib/mysql
+networks:
+  frontend:
+    external: true
+  backend:
+    external: true

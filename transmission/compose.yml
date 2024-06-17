@@ -1,0 +1,75 @@
+version: "3"
+networks:
+  frontend:
+    driver: bridge
+    name: frontend
+    external: true
+services:
+  transmission:
+    image: lscr.io/linuxserver/transmission:latest
+    container_name: transmission
+    network_mode: service:gluetun
+    depends_on:
+      gluetun:
+        condition: service_started
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Berlin
+      - DOCKER_MODS=linuxserver/mods:transmission-env-var-settings
+      - TRANSMISSION_TRASH-CATN-ENABLED=false
+      - TRANSMISSION_ENCRYPTION=2
+      - TRANSMISSION_IDLE_SEEDING_LIMIT_ENABLED=true
+      - TRANSMISSION_RATIO_LIMIT=3
+      - TRANSMISSION_RATIO_LIMIT_ENABLED=true
+      - TRANSMISSION_DOWNLOAD_DIR=/torrent/
+      - TRANSMISSION_INCOMPLETE_DIR_ENABLED=false
+      - TRANSMISSION_WATCH_DIR_ENABLED=false
+    volumes:
+      - /media/torrent:/torrent
+      - ./transmission:/config
+    healthcheck:
+      test: curl -sf https://example.com  || exit 1
+      interval: 1m
+      timeout: 10s
+      retries: 1
+    labels:
+      - homepage.group=Torrent
+      - homepage.name=Transmission
+      - homepage.icon=si-flood
+      - homepage.href=https://transmission.luks.cool/
+      - homepage.description=Open Source BitTorrent Client
+      - homepage.widget.type=transmission
+      - homepage.widget.url=http://gluetun:9091
+      - com.centurylinklabs.watchtower.enable=true
+    restart: unless-stopped
+  gluetun:
+    image: qmcgaw/gluetun:latest
+    container_name: gluetun
+    networks:
+      - frontend
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - 51413:51413
+      - 51413:51413/udp
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Berlin
+      - VPN_SERVICE_PROVIDER=surfshark
+      - VPN_TYPE=openvpn
+      - OPENVPN_USER=${OPENVPN_USER}
+      - OPENVPN_PASSWORD=${OPENVPN_PASSWORD}
+      - SERVER_COUNTRIES=Luxembourg,Belgium,Netherlands
+      - FIREWALL_OUTBOUND_SUBNETS=172.21.0.0/16
+      - HTTPPROXY=ON
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.gluetun_transmission.rule=Host(`transmission.luks.cool`)
+      - traefik.http.routers.gluetun_transmission.entrypoints=https
+      - traefik.http.services.gluetun_transmission.loadbalancer.server.port=9091
+      - com.centurylinklabs.watchtower.enable=true
+    restart: unless-stopped

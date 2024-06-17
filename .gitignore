@@ -1,0 +1,7 @@
+.env
+.vscode
+password.txt
+secrets.yaml
+log
+*.log
+*/*/*

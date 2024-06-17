@@ -1,0 +1,26 @@
+services:
+  netalertx:
+    container_name: NetAlertX
+    hostname: NetAlertX
+    privileged: true
+    image: jokobsk/netalertx:latest
+    environment:
+      - TZ=Europe/Berlin
+    restart: always
+    volumes:
+      - config:/app/config
+      - db:/app/db      
+    network_mode: host
+    labels:
+      - homepage.group=Network
+      - homepage.name=NetAlertX
+      - homepage.icon=si-nextdns
+      - homepage.href=https://netalertx.luks.cool/
+      - homepage.description=Network Security Scanner
+      - traefik.enable=true
+      - traefik.http.routers.netalertx.entrypoints=https
+      - traefik.http.services.netalertx.loadbalancer.server.port=20211
+      - com.centurylinklabs.watchtower.enable=true
+volumes:
+  config:
+  db:

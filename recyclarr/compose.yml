@@ -1,0 +1,16 @@
+networks:
+  backend:
+    name: backend
+    external: true
+services:
+  recyclarr:
+    image: ghcr.io/recyclarr/recyclarr
+    container_name: recyclarr
+    user: 1000:1000
+    networks:
+      backend: null
+    volumes:
+      - ./config:/config
+    environment:
+      - TZ=Europe/Berlin
+    restart: unless-stopped

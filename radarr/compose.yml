@@ -1,0 +1,36 @@
+version: "3"
+networks:
+  frontend:
+    driver: bridge
+    name: frontend
+    external: true
+  backend:
+    driver: bridge
+    name: backend
+    external: true
+services:
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    networks:
+      - frontend
+      - backend
+    volumes:
+      - ./config:/config
+      - /media/truenas:/media
+      - /media/torrent:/torrent
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Berlin
+    labels:
+      - homepage.group=Media
+      - homepage.name=Radarr
+      - homepage.icon=si-radarr
+      - homepage.href=https://radarr.luks.cool/
+      - homepage.description=Internet PVR for Movies
+      - traefik.enable=true
+      - traefik.http.routers.radarr.entrypoints=https
+      - traefik.http.services.radarr.loadbalancer.server.port=7878
+      - com.centurylinklabs.watchtower.enable=true
+    restart: unless-stopped

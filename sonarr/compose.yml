@@ -1,0 +1,36 @@
+version: "3"
+networks:
+  frontend:
+    driver: bridge
+    name: frontend
+    external: true
+  backend:
+    driver: bridge
+    name: backend
+    external: true
+services:
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    networks:
+      - frontend
+      - backend
+    volumes:
+      - ./config:/config
+      - /media/truenas:/media
+      - /media/torrent:/torrent
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Berlin
+    labels:
+      - homepage.group=Media
+      - homepage.name=Sonarr
+      - homepage.icon=si-sonarr
+      - homepage.href=https://sonarr.${DOMAIN}/
+      - homepage.description=Internet PVR for TV Shows
+      - traefik.enable=true
+      - traefik.http.routers.sonarr.entrypoints=https
+      - traefik.http.services.sonarr.loadbalancer.server.port=8989
+      - com.centurylinklabs.watchtower.enable=true
+    restart: unless-stopped
