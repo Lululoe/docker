@@ -1,0 +1,40 @@
+---
+# For configuration options and examples, please see:
+# https://gethomepage.dev/en/configs/settings
+
+providers:
+  openweathermap: openweathermapapikey
+  weatherapi: weatherapiapikey
+
+title: luks.cool - Homepage
+useEqualHeights: true
+
+cardBlur: xl # sm, "", md, etc... see https://tailwindcss.com/docs/backdrop-blur
+
+# favicon: /images/favicon-32x32.png
+
+headerStyle: clean
+# hideErrors: true
+hideVersion: true
+
+quicklaunch:
+    searchDescriptions: true
+    hideVisitURL: true
+
+target: _self # Possible options include _blank, _self, and _top
+
+layout:
+  Media:
+    icon: mdi-movie-play
+  Smart Home:
+    icon: mdi-home-assistant
+  Torrent:
+    icon: mdi-file-download
+  Administration:
+    icon: mdi-cog
+  Files:
+    icon: mdi-folder
+  Statistics:
+    icon: mdi-chart-areaspline-variant
+  Network:
+    icon: mdi-lan

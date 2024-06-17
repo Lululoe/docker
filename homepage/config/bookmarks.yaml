@@ -1,0 +1,33 @@
+---
+# For configuration options and examples, please see:
+# https://gethomepage.dev/en/configs/bookmarks
+
+- Developer:
+    - Github:
+        - icon: si-git
+          href: https://github.com/
+    - Backblaze:
+        - icon: si-backblaze
+          href: https://secure.backblaze.com/
+    - Cloudflare:
+        - icon: si-cloudflare
+          href: https://cloudflare.com/
+- Social:
+    - Reddit:
+        - icon: si-reddit
+          href: https://reddit.com/
+    - Twitter:
+        - icon: si-twitter
+          href: https://twitter.com/
+    
+- Entertainment:
+    - YouTube:
+        - icon: si-youtube
+          href: https://youtube.com/
+    - TCBScans:
+        - icon: mdi-book
+          href: https://tcbscans.com/
+    - Mangaplus:
+        - icon: mdi-plus-circle
+          href: https://mangaplus.shueisha.co.jp/
+    

@@ -1,0 +1,5 @@
+!config/*
+!config/*
+services.yaml
+widgets.yaml
+logs
